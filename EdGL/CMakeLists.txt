@@ -16,6 +16,7 @@ add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glm)
 
 # Assimp
+option(ASSIMP_INSTALL OFF)
 option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 option(ASSIMP_BUILD_SAMPLES OFF)
 option(ASSIMP_BUILD_TESTS OFF)
