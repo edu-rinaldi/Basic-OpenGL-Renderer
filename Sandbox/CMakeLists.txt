@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8)
 project(Sandbox VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -16,3 +16,7 @@ add_custom_command(
     DEPENDS ${destination}
     COMMENT "symbolic link resources folder from ${source} => ${destination}"
 )
+
+if(MSVC)
+set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:Sandbox>)
+endif(MSVC)
