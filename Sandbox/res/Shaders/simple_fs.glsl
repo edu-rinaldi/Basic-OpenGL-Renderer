@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 struct Material
 {
@@ -74,4 +74,4 @@ void main()
 		texture(material.ambientTexture, v_TexCoord);
 	
 	
-};
+}

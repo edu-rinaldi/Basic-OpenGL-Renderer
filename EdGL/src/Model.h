@@ -16,7 +16,7 @@ public:
 	Model(const char* path);
 	~Model();
 	inline const std::vector<std::shared_ptr<Mesh>>& GetMeshes() const { return m_Meshes; }
-	inline const glm::vec3& GetPosition() const { return GetModelMatrix() * glm::vec4(m_Position, 1); }
+	inline const glm::vec3 GetPosition() const { return GetModelMatrix() * glm::vec4(m_Position, 1); }
 	
 	glm::mat4 GetModelMatrix() const;
 	glm::vec3 direction = glm::vec3(1.f, 0, 0);

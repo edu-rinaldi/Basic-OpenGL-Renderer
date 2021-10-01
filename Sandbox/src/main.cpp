@@ -27,14 +27,15 @@ int main(void)
     /* Initialize the library */
     if (!glfwInit())
         return -1;
-
+    
     WindowBuilder builder;
     builder.AddWindowHint(GLFW_SAMPLES, 4);
+    builder.AddWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    builder.AddWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     Window window = builder.Build("Scene", 1280, 720);
     
     /* Make the window's context current */
     window.MakeContextCurrent();
-
     window.SetInputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
@@ -45,7 +46,9 @@ int main(void)
     if (glewInit() != GLEW_OK)
         std::cerr << "Error initializing GLEW" << std::endl;
 
-    ErrorHandler* errorHandler = ErrorHandler::GetInstance();
+    printf("v %s", glGetString(GL_VERSION));
+
+    //ErrorHandler* errorHandler = ErrorHandler::GetInstance();
     int shaderType = 0;
     std::unique_ptr<Shader> shader;
     switch (shaderType)
@@ -65,7 +68,6 @@ int main(void)
     default:
         break;
     }
-
     // Models
     auto modelPath1 = "res/Models/backpack/backpack.obj";
     auto modelPath2 = "res/Models/watchtower/wooden watch tower2.obj";
