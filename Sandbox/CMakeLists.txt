@@ -9,7 +9,7 @@ target_link_libraries(${PROJECT_NAME} EdGL)
 target_include_directories(${PROJECT_NAME} PRIVATE EdGL)
 
 set (source ${CMAKE_CURRENT_SOURCE_DIR}/res)
-set (destination ${CMAKE_CURRENT_BINARY_DIR}/res)
+set (destination $<TARGET_FILE_DIR:Sandbox>/res)
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
