@@ -1,0 +1,22 @@
+# Exported from Figuro at https://www.figuro.io
+
+mtllib floor.mtl
+o rectangle2
+v -0.5 0 -0.5
+v 0.5 0 -0.5
+v 0.5 0 0.5
+v -0.5 0 0.5
+# 4 vertices
+vt 0 0
+vt 1 0
+vt 1 1
+vt 0 1
+# 4 uvs
+vn 0 1 0
+vn 0 1 0
+vn 0 1 0
+vn 0 1 0
+# 4 normals
+usemtl uvgrid
+f 4/4/4 3/3/3 2/2/2 1/1/1 
+# 1 polygons

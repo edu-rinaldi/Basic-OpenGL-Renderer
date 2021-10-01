@@ -1,0 +1,4 @@
+# Exported from Figuro at https://www.figuro.io
+
+newmtl uvgrid
+   map_Kd uvgrid.png

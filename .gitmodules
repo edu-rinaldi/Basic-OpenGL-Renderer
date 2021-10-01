@@ -1,0 +1,12 @@
+[submodule "EdGL/dependencies/glew"]
+	path = EdGL/dependencies/glew
+	url = https://github.com/Perlmint/glew-cmake/
+[submodule "EdGL/dependencies/glfw"]
+	path = EdGL/dependencies/glfw
+	url = https://github.com/glfw/glfw
+[submodule "EdGL/dependencies/glm"]
+	path = EdGL/dependencies/glm
+	url = https://github.com/g-truc/glm
+[submodule "EdGL/dependencies/assimp"]
+	path = EdGL/dependencies/assimp
+	url = https://github.com/assimp/assimp
