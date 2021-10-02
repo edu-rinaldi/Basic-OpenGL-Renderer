@@ -1,143 +1,88 @@
 #include "Application.h"
-#include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/vector_angle.hpp>
-
-#include "ErrorHandler.h"
-#include "Shader.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBufferLayout.h"
-#include "Texture.h"
-#include "Camera.h"
-#include "Input.h"
-#include "Mesh.h"
-#include "Model.h"
 #include "Window.h"
 
-const float FOV = 45;
+namespace edgl {
 
-int run(void)
+Application::Application(ApplicationSettings settings) : m_OldTime(0), m_CurrentTime(0), m_DT(0), m_Settings(settings)
 {
+    if(!Init(settings)) throw ApplicationCreationException();
+}
 
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
+void Application::OnInit() {}
+void Application::OnLoop(float dt) {}
 
-    WindowBuilder builder;
-    builder.AddWindowHint(GLFW_SAMPLES, 4);
-    Window window = builder.Build("Scene", 1280, 720);
-    
-    /* Make the window's context current */
-    window.MakeContextCurrent();
-
-    window.SetInputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_MULTISAMPLE);
-    // glEnable(GL_FRAMEBUFFER_SRGB);  // Gamma correction
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    if (glewInit() != GLEW_OK)
-        std::cerr << "Error initializing GLEW" << std::endl;
-
-    ErrorHandler* errorHandler = ErrorHandler::GetInstance();
-    int shaderType = 0;
-    std::unique_ptr<Shader> shader;
-    switch (shaderType)
+bool Application::Init(const ApplicationSettings& settings)
+{
+    if(!glfwInit()) 
     {
-    case 0:
-        shader = std::unique_ptr<Shader>(new Shader("res/Shaders/simple_vs.glsl", "res/Shaders/simple_fs.glsl"));
-        break;
-    case 1:
-        shader = std::unique_ptr<Shader>(new Shader("res/Shaders/simple_vs.glsl", "res/Shaders/debug_normals_fs.glsl"));
-        break;
-    case 2:
-        shader = std::unique_ptr<Shader>(new Shader("res/Shaders/simple_vs.glsl", "res/Shaders/debug_uv_fs.glsl"));
-        break;
-    case 3:
-        shader = std::unique_ptr<Shader>(new Shader("res/Shaders/simple_vs.glsl", "res/Shaders/base_material_fs.glsl"));
-        break;
-    default:
-        break;
+        // Log error
+        return false;
     }
 
-    // Models
-    auto modelPath1 = "res/Models/backpack/backpack.obj";
-    auto modelPath2 = "res/Models/watchtower/wooden watch tower2.obj";
-    auto modelPath3 = "res/Models/tv/retrotv0319.obj";
-    auto modelPath4 = "res/Models/floor/floor.obj";
-    auto modelPath5 = "res/Models/mercedes/mercedes.obj";
-    auto bb8Path = "res/Models/bb8/BB-8.obj";
-    Model plane(modelPath4);
-    plane.Scale(glm::vec3(10.f));
-    plane.Move(glm::vec3(0.f));
-
-    Model backpack(modelPath1);
-    backpack.Move(glm::vec3(0.f, 0.5f, 0.f));
-    backpack.Scale(glm::vec3(0.2f));
-
-    Model backpack2(modelPath1);
-    backpack2.Move(glm::vec3(6.f, 0.5f, 0.f));
-    backpack2.Scale(glm::vec3(0.2f));
-
-    Camera* camera = new Camera(glm::vec3(0.0f, 0.2f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    WindowBuilder windowBuilder;
+    if(settings.m_MultiSample) windowBuilder.AddWindowHint(GLFW_SAMPLES, settings.m_Samples);
     
-    InputManager inputManager(window, camera);
-    glm::mat4 projection = glm::perspective(glm::radians(FOV), window.GetWidth() / window.GetHeight(), 0.01f, 100.0f);
-    shader->SetMatrix4f("u_Projection", projection);
+    windowBuilder.AddWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    windowBuilder.AddWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    // Light
-    shader->SetVec3("u_Light.position", backpack2.GetPosition());
-    glm::vec3 lightColor = glm::vec3(1.f);
-    shader->SetVec3("u_Light.ambient", glm::vec3(0.f));
-    shader->SetVec3("u_Light.diffuse", lightColor);
-    shader->SetVec3("u_Light.specular", lightColor);
-    shader->SetFloat("u_Light.constant", 1.f);
-    shader->SetFloat("u_Light.linear", 0.0014f);
-    shader->SetFloat("u_Light.quadratic", 0.000007f);
+    m_Window = windowBuilder.Build(settings.m_Name.c_str(), static_cast<float>(settings.m_WindowWidth), static_cast<float>(settings.m_WindowHeight));
+    m_Window->MakeContextCurrent();
+    m_Window->SetInputMode(GLFW_CURSOR, settings.m_CursorsMode);
 
-    float oldTime = glfwGetTime();
-    glClearColor(0.1,0.1,0.1, 1.f);
-    /* Loop until the user closes the window */
-    float i = 0;
-    int frames = 1;
-    while (!window.WindowShouldClose())
+    // Depth test
+    if(settings.m_DepthTest) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+
+    // Gamma correction
+    if(settings.m_GammaCorrection) glEnable(GL_FRAMEBUFFER_SRGB);
+    else glDisable(GL_FRAMEBUFFER_SRGB);
+
+    // Blend function
+    if(settings.m_Blend) 
+    { 
+        glEnable(GL_BLEND);
+        glBlendFunc(settings.m_BlendFunction.sourceFactor, settings.m_BlendFunction.destinationFactor);
+    }
+    else glDisable(GL_BLEND);
+
+    if(glewInit() != GLEW_OK) 
     {
-        /* Render here */
+        // Log error
+        return false;
+    }
+
+    glClearColor(settings.m_ClearColor.r,settings.m_ClearColor.g, settings.m_ClearColor.b, settings.m_ClearColor.a);
+    printf("GL Version: %s \n", glGetString(GL_VERSION));
+
+    return true;
+}
+
+void Application::Loop()
+{
+    while(!m_Window->WindowShouldClose())
+    {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        float currentTime = glfwGetTime();
-        float dt = currentTime - oldTime;
-        oldTime = currentTime;
+        
+        // Delta
+        m_CurrentTime = glfwGetTime();
+        m_DT = m_CurrentTime - m_OldTime;
+        m_OldTime = m_CurrentTime;
 
-        inputManager.ProcessInput(dt);
-        shader->SetVec3("u_CameraPosition", camera->GetPosition());
-        
-        backpack.Rotate(1, glm::vec3(0, 1, 0));
-        backpack2.Move(glm::vec3(- glm::sin(i) * dt * 10, 0, 0));
-        i += 0.01;
-        shader->SetVec3("u_Light.position", backpack2.GetPosition() + glm::vec3(0,0,1));
-        // View
-        glm::mat4 view = camera->GetViewMatrix();
-        shader->SetMatrix4f("u_View", view);
-        
-        
-        backpack.Draw(*shader);
-        backpack2.Draw(*shader);
-        plane.Draw(*shader);
+        OnLoop(m_DT);
+
         // Swap front and back buffers
-        window.SwapBuffers();
-
+        m_Window->SwapBuffers();
         // Poll for and process events
         glfwPollEvents();
-        frames++;
+
     }
-    delete camera;
     glfwTerminate();
-    return 0;
+
+}
+
+void Application::Run() { OnInit(); Loop(); }
+
 }

@@ -30,6 +30,7 @@ public:
 	void SetWindowTitle(const char* title);
 	void SetInputMode(int mode, int value) const;
 	void SetWindowShouldClose(bool value) const;
+	void SetMultiSample(bool value) const;
 	int WindowShouldClose() const;
 	void MakeContextCurrent() const;
 	void SwapBuffers() const;
@@ -42,8 +43,11 @@ class WindowBuilder
 {
 public:
 	WindowBuilder();
-	const WindowBuilder& AddWindowHint(int windowHint, int value) const;
-	Window Build(const char* windowTitle, float width, float height) const;
+	WindowBuilder& AddWindowHint(int windowHint, int value);
+	std::shared_ptr<Window> Build(const char* windowTitle, float width, float height) const;
+
+private:
+	bool m_MultiSample;
 	
 };
 

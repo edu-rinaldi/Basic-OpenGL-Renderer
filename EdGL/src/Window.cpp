@@ -32,6 +32,12 @@ void Window::SetWindowShouldClose(bool value) const
 	glfwSetWindowShouldClose(m_Window, value ? GL_TRUE : GL_FALSE);
 }
 
+void Window::SetMultiSample(bool value) const
+{
+	if(value) glEnable(GL_MULTISAMPLE);
+	else glDisable(GL_MULTISAMPLE);
+}
+
 int Window::WindowShouldClose() const
 {
 	return glfwWindowShouldClose(m_Window);
@@ -64,18 +70,21 @@ CursorPosition Window::GetCursorPosition() const
 	return CursorPosition{ posX, posY };
 }
 
-WindowBuilder::WindowBuilder()
+WindowBuilder::WindowBuilder() : m_MultiSample(false)
 {
 	glfwDefaultWindowHints();
 }
 
-const WindowBuilder& WindowBuilder::AddWindowHint(int windowHint, int value) const
+WindowBuilder& WindowBuilder::AddWindowHint(int windowHint, int value)
 {
 	glfwWindowHint(windowHint, value);
+	if(windowHint == GL_SAMPLES) m_MultiSample = true;
 	return *this;
 }
 
-Window WindowBuilder::Build(const char* windowTitle, float width, float height) const
+std::shared_ptr<Window> WindowBuilder::Build(const char* windowTitle, float width, float height) const
 {
-	return Window(windowTitle, width, height);
+	auto window = std::make_shared<Window>(windowTitle, width, height);
+	window->SetMultiSample(m_MultiSample);
+	return window;
 }
