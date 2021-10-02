@@ -19,7 +19,7 @@ SandboxApp::SandboxApp() :
 edgl::ApplicationSettings SandboxApp::GetSettings()
 {
     edgl::ApplicationSettings settings;
-    settings.m_Name = "Sandbox application";
+    settings.m_Name = "Sandbox test application @ EdGL 0.0.1";
     settings.m_Samples = 4;
     settings.m_MultiSample = true;
 
@@ -35,7 +35,7 @@ edgl::ApplicationSettings SandboxApp::GetSettings()
     settings.m_Blend = true;
     settings.m_BlendFunction = { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA };
 
-    settings.m_Fov = 45.f;
+    settings.m_Fov = 60.f;
     return settings;
 }
 
@@ -68,11 +68,14 @@ void SandboxApp::OnInit()
     auto modelPath4 = "res/Models/floor/floor.obj";
     auto modelPath5 = "res/Models/mercedes/mercedes.obj";
     auto bb8Path = "res/Models/bb8/BB-8.obj";
-
-    auto specMaterial = std::shared_ptr<Material>(new Material(glm::vec3(0), Texture::BlankTexture(), 
-        glm::vec3(0), Texture::BlankTexture(), 
-        glm::vec3(0.8f, 0.8, 1.f), Texture::BlankTexture(),
-        128));
+    auto whiteTexture = Texture2D::FlatColor(glm::vec3(1.f), 1, 1, "white");
+    auto specMaterial = std::shared_ptr<Material>(
+        new Material(
+            glm::vec3(0.f), whiteTexture,
+            glm::vec3(0.f), whiteTexture,
+            glm::vec3(0.0f, 0.0f, 1.f), whiteTexture,
+            128)
+        );
 
     auto plane = std::make_shared<Model>(modelPath4);
     plane->Scale(glm::vec3(10.f));

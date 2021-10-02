@@ -1,59 +1,89 @@
 #pragma once
-#include <iostream>
 #include <GL/glew.h>
 #include <memory>
 #include <unordered_map>
 
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+
+enum TextureType
+{
+	TEXTURE_1D = GL_TEXTURE_1D,
+	TEXTURE_2D = GL_TEXTURE_2D,
+	TEXTURE_3D = GL_TEXTURE_3D,
+	TEXTURE_1D_ARRAY = GL_TEXTURE_1D_ARRAY,
+	TEXTURE_2D_ARRAY = GL_TEXTURE_2D_ARRAY,
+	TEXTURE_RECTANGLE = GL_TEXTURE_RECTANGLE,
+	TEXTURE_CUBE_MAP = GL_TEXTURE_CUBE_MAP,
+	TEXTURE_CUBE_MAP_ARRAY = GL_TEXTURE_CUBE_MAP_ARRAY,
+	TEXTURE_BUFFER = GL_TEXTURE_BUFFER,
+	TEXTURE_2D_MULTISAMPLE = GL_TEXTURE_2D_MULTISAMPLE,
+	TEXTURE_2D_MULTISAMPLE_ARRAY = GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+};
+
 class Texture
 {
 public:
-	enum TextureType 
-	{
-		TEXTURE_1D = GL_TEXTURE_1D, 
-		TEXTURE_2D = GL_TEXTURE_2D, 
-		TEXTURE_3D = GL_TEXTURE_3D, 
-		TEXTURE_1D_ARRAY = GL_TEXTURE_1D_ARRAY, 
-		TEXTURE_2D_ARRAY = GL_TEXTURE_2D_ARRAY, 
-		TEXTURE_RECTANGLE = GL_TEXTURE_RECTANGLE, 
-		TEXTURE_CUBE_MAP = GL_TEXTURE_CUBE_MAP, 
-		TEXTURE_CUBE_MAP_ARRAY = GL_TEXTURE_CUBE_MAP_ARRAY, 
-		TEXTURE_BUFFER = GL_TEXTURE_BUFFER, 
-		TEXTURE_2D_MULTISAMPLE = GL_TEXTURE_2D_MULTISAMPLE, 
-		TEXTURE_2D_MULTISAMPLE_ARRAY = GL_TEXTURE_2D_MULTISAMPLE_ARRAY
-	};
-
-private:
-	unsigned int m_Id;
-	unsigned char* m_Texture;
-	int m_Width;
-	int m_Height;
-	int m_NrChannels;
-	enum TextureType m_Type;
-	// TODO: Implement texture caching
-	static std::unordered_map<std::string, std::shared_ptr<Texture>> m_Cache;
-	std::string m_CacheName;
-	
-	Texture();
-	Texture(const Texture& obj);
-	Texture(unsigned char* texture, int width, int height, int channels, const std::string& name, TextureType targetType = TEXTURE_2D);
-public:
-
-	// Texture(const Texture& obj);
-	// Texture();
-	// Texture(const std::string& texturePath, TextureType targetType = TEXTURE_2D);
-	~Texture();
-	static std::shared_ptr<Texture> LoadTextureFromFile(const std::string& texturePath, TextureType targetType = TEXTURE_2D);
-	static std::shared_ptr<Texture> BlankTexture();
 	// Getters
-	inline unsigned int GetId() const { return m_Id; }
-	inline const unsigned char* GetTextureData() const { return m_Texture; }
+	virtual inline unsigned int GetId() const { return m_Id; }
+	virtual inline const std::unique_ptr<uint8_t>& GetTextureData() const { return m_Data; }
+	
+	// Setters
+	// Texture Bind() / Unbind()
+	virtual void Bind(int unit) const;
+	virtual void Unbind() const;
+
+protected:
+	unsigned int m_Id;
+	std::unique_ptr<uint8_t> m_Data;
+	TextureType m_Type;
+	std::string m_CacheName;
+
+	static std::unordered_map<std::string, std::shared_ptr<Texture>> m_Cache;
+	
+	Texture(TextureType targetType, const std::string& textureName);
+	~Texture();
+private:
+	
+	Texture() = delete;
+	Texture(const Texture& obj) = delete;
+};
+
+class Texture2D : public Texture
+{
+public:
+	static std::shared_ptr<Texture> FlatColor(const glm::vec3& color, int width, int height, const std::string& textureName);
+	static std::shared_ptr<Texture> FlatColor(const glm::vec4& color, int width, int height, const std::string& textureName);
+	static std::shared_ptr<Texture> FromFile(const std::string& texturePath, const std::string& textureName);
+	static std::shared_ptr<Texture> FromFile(const std::string& texturePath);
+
 	inline int GetWidth() const { return m_Width; }
 	inline int GetHeight() const { return m_Height; }
 	inline int GetNumberOfChannels() const { return m_NrChannels; }
+private:
+	Texture2D(const std::string& texturePath, const std::string& textureName);
+	Texture2D(const glm::vec3& color, int width, int height, const std::string& textureName);
+	Texture2D(const glm::vec4& color, int width, int height, const std::string& textureName);
 
-	// Setters
+	int m_Width;
+	int m_Height;
+	int m_NrChannels;
+};
 
-	// Texture Bind() / Unbind()
-	void Bind(int unit) const;
-	void Unbind() const;
+class FailedToLoadTextureException : public std::exception
+{
+public:
+	FailedToLoadTextureException(const std::string& texturePath) : 
+		m_Message(std::string("Failed to load texture located at this path: ") +texturePath) {}
+private:
+	std::string m_Message;
+	inline virtual const char* what() const throw() override 
+	{ 
+		return m_Message.c_str();
+	}
+};
+
+class FailedToCreateTexture : public std::exception
+{
+	inline virtual const char* what() const throw() override { return "Failed to create texture"; }
 };
