@@ -44,6 +44,12 @@ void Model::Draw(Shader& shader) const
 		mesh->Draw(shader);
 }
 
+void Model::ApplyMaterial(std::shared_ptr<Material> material)
+{
+	for(auto& mesh : m_Meshes)
+		mesh->SetMaterial(material);
+}
+
 void Model::LoadModel(const char* path)
 {
 	Assimp::Importer importer;

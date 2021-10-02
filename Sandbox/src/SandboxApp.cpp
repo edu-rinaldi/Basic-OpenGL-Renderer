@@ -2,6 +2,8 @@
 
 #include "Shader.h"
 #include "Model.h"
+#include "Texture.h"
+#include "Material.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -67,6 +69,11 @@ void SandboxApp::OnInit()
     auto modelPath5 = "res/Models/mercedes/mercedes.obj";
     auto bb8Path = "res/Models/bb8/BB-8.obj";
 
+    auto specMaterial = std::shared_ptr<Material>(new Material(glm::vec3(0), Texture::BlankTexture(), 
+        glm::vec3(0), Texture::BlankTexture(), 
+        glm::vec3(0.8f, 0.8, 1.f), Texture::BlankTexture(),
+        128));
+
     auto plane = std::make_shared<Model>(modelPath4);
     plane->Scale(glm::vec3(10.f));
     plane->Move(glm::vec3(0.f));
@@ -76,11 +83,13 @@ void SandboxApp::OnInit()
     backpack->Move(glm::vec3(0.f, 0.5f, 0.f));
     backpack->Scale(glm::vec3(0.2f));
     m_Models.push_back(backpack);
+    backpack->ApplyMaterial(specMaterial);
 
     auto backpack2 = std::make_shared<Model>(modelPath1);
     backpack2->Move(glm::vec3(2.f, 0.5f, 0.f));
     backpack2->Scale(glm::vec3(0.2f));
     m_Models.push_back(backpack2);
+    
 
     m_Shader->SetMatrix4f("u_Projection", m_Projection);
     // Light
@@ -105,9 +114,9 @@ void SandboxApp::OnLoop(float dt)
     auto backpack2 = m_Models[2];
 
     backpack->Rotate(1, glm::vec3(0, 1, 0));
-    backpack2->Move(glm::vec3(- glm::sin(tmp) * dt * 10, 0, 0));
+    backpack2->Move(glm::vec3(- glm::sin(tmp) * dt * 8, 0, 0));
     tmp += 0.01;
-    m_Shader->SetVec3("u_Light.position", backpack2->GetPosition());
+    m_Shader->SetVec3("u_Light.position", backpack2->GetPosition() + glm::vec3(0,0,1) * 0.5f);
     // View
     glm::mat4 view = m_Camera->GetViewMatrix();
     m_Shader->SetMatrix4f("u_View", view);

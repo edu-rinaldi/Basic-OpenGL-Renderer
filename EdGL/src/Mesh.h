@@ -20,11 +20,11 @@ public:
 	inline const VertexArray& GetVAO() const { return *m_Vao; }
 	inline const VertexBuffer& GetVBO() const { return *m_Vbo; }
 	inline const IndexBuffer& GetIBO() const { return *m_Ibo; }
-
 	inline unsigned int GetVerticesNumber() const { return m_VerticesNumber; }
 	inline unsigned int GetIndicesNumber() const { return m_IndicesNumber; }
 
 	void Draw(Shader& shader) const;
+	inline void SetMaterial(std::shared_ptr<Material> material) { m_Material = material; }
 
 private:
 	unsigned int m_VerticesNumber;

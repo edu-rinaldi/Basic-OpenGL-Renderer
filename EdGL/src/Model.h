@@ -24,7 +24,7 @@ public:
 	void Rotate(float amount, const glm::vec3& rotationAxes);
 	void Scale(const glm::vec3& amount);
 	void Draw(Shader& shader) const;
-
+	void ApplyMaterial(std::shared_ptr<Material> material);
 private:
 	std::vector<std::shared_ptr<Mesh>> m_Meshes;
 	glm::vec3 m_Position;
