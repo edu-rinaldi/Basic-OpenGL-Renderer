@@ -95,15 +95,19 @@ void SandboxApp::OnInit()
 
 }
 
+static float tmp = 0;
 void SandboxApp::OnLoop(float dt)
 {
     m_InputManager->ProcessInput(dt);
     m_Shader->SetVec3("u_CameraPosition", m_Camera->GetPosition());
     
-    // backpack.Rotate(1, glm::vec3(0, 1, 0));
-    // backpack2.Move(glm::vec3(- glm::sin(i) * dt * 10, 0, 0));
-    // i += 0.01;
-    // m_Shader->SetVec3("u_Light.position", glm::vec3(0,2,0));
+    auto backpack = m_Models[1];
+    auto backpack2 = m_Models[2];
+
+    backpack->Rotate(1, glm::vec3(0, 1, 0));
+    backpack2->Move(glm::vec3(- glm::sin(tmp) * dt * 10, 0, 0));
+    tmp += 0.01;
+    m_Shader->SetVec3("u_Light.position", backpack2->GetPosition());
     // View
     glm::mat4 view = m_Camera->GetViewMatrix();
     m_Shader->SetMatrix4f("u_View", view);
