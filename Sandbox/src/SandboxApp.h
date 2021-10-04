@@ -3,9 +3,14 @@
 
 #include "Application.h"
 
+namespace edgl {
+
 class Model;
 class Shader;
 
+}
+
+using namespace edgl;
 class SandboxApp : public edgl::Application
 {
 public:

@@ -7,13 +7,15 @@
 #include "Texture.h"
 #include "Vertex.h"
 
+namespace edgl {
+
 class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 class Material;
 
 class Mesh
-{	
+{
 public:
 	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Material> material);
 	~Mesh();
@@ -37,3 +39,5 @@ private:
 	IndexBuffer* m_Ibo;
 
 };
+
+}

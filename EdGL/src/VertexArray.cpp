@@ -1,5 +1,7 @@
 #include "VertexArray.h"
 
+namespace edgl {
+
 VertexArray::VertexArray()
 {
 	glGenVertexArrays(1, &m_Id);
@@ -39,4 +41,6 @@ void VertexArray::Bind() const
 void VertexArray::Unbind() const
 {
 	glBindVertexArray(0);
+}
+
 }

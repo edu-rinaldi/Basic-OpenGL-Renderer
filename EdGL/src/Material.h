@@ -3,6 +3,8 @@
 #include<glm/glm.hpp>
 #include"Texture.h"
 
+namespace edgl {
+
 class Material
 {
 private:
@@ -14,7 +16,7 @@ private:
 
 	glm::vec3 m_Specular;
 	std::shared_ptr<Texture> m_SpecularTexture;
-	
+
 	float m_Shininess;
 
 public:
@@ -39,3 +41,4 @@ public:
 	inline float GetShininess() const { return m_Shininess; }
 };
 
+}

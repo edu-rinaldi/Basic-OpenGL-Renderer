@@ -6,6 +6,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+namespace edgl {
+
 Shader::Shader(const std::string& vertexShader, const std::string& fragmentShader)
 {
     m_Id = glCreateProgram();
@@ -109,7 +111,7 @@ void Shader::ParseShaderFile(const std::string& fname, std::string& outShader)
     }
     else
     {
-        throw std::invalid_argument("Non existing input shader file at: " + fname) ;
+        throw std::invalid_argument("Non existing input shader file at: " + fname);
     }
 }
 
@@ -117,10 +119,11 @@ std::string Shader::GetType(unsigned int type)
 {
     switch (type)
     {
-        case GL_FRAGMENT_SHADER: return "Fragment";
-        case GL_VERTEX_SHADER: return "Vertex";
-        case GL_GEOMETRY_SHADER: return "Geometry";
-        default: return "Invalid";
+    case GL_FRAGMENT_SHADER: return "Fragment";
+    case GL_VERTEX_SHADER: return "Vertex";
+    case GL_GEOMETRY_SHADER: return "Geometry";
+    default: return "Invalid";
     }
 }
 
+}

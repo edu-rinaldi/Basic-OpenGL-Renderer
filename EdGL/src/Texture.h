@@ -6,6 +6,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+namespace edgl {
+
 enum TextureType
 {
 	TEXTURE_1D = GL_TEXTURE_1D,
@@ -27,7 +29,7 @@ public:
 	// Getters
 	virtual inline unsigned int GetId() const { return m_Id; }
 	virtual inline const std::unique_ptr<uint8_t>& GetTextureData() const { return m_Data; }
-	
+
 	// Setters
 	// Texture Bind() / Unbind()
 	virtual void Bind(int unit) const;
@@ -40,11 +42,11 @@ protected:
 	std::string m_CacheName;
 
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> m_Cache;
-	
+
 	Texture(TextureType targetType, const std::string& textureName);
 	~Texture();
 private:
-	
+
 	Texture() = delete;
 	Texture(const Texture& obj) = delete;
 };
@@ -73,12 +75,12 @@ private:
 class FailedToLoadTextureException : public std::exception
 {
 public:
-	FailedToLoadTextureException(const std::string& texturePath) : 
-		m_Message(std::string("Failed to load texture located at this path: ") +texturePath) {}
+	FailedToLoadTextureException(const std::string& texturePath) :
+		m_Message(std::string("Failed to load texture located at this path: ") + texturePath) {}
 private:
 	std::string m_Message;
-	inline virtual const char* what() const throw() override 
-	{ 
+	inline virtual const char* what() const throw() override
+	{
 		return m_Message.c_str();
 	}
 };
@@ -87,3 +89,5 @@ class FailedToCreateTexture : public std::exception
 {
 	inline virtual const char* what() const throw() override { return "Failed to create texture"; }
 };
+
+}

@@ -3,6 +3,7 @@
 #include "IndexBuffer.h"
 #include "VertexBufferLayout.h"
 
+namespace edgl {
 
 class VertexArray
 {
@@ -18,3 +19,5 @@ public:
 	void Bind() const;
 	void Unbind() const;
 };
+
+}

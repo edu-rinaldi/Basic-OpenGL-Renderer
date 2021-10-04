@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+namespace edgl {
+
 class InputManager
 {
 private:
@@ -19,3 +21,5 @@ public:
 
 
 };
+
+}

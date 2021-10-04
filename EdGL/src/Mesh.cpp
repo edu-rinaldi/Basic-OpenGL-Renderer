@@ -2,6 +2,8 @@
 #include "VertexArray.h"
 #include "Material.h"
 
+namespace edgl {
+
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Material> material) :
 	m_VerticesNumber(vertices.size()),
 	m_IndicesNumber(indices.size()),
@@ -32,7 +34,7 @@ void Mesh::Draw(Shader& shader) const
 	int numberOfTexture = 0;
 
 	shader.Bind();
-	
+
 	// Ambient color and texture
 	shader.SetVec3("material.ambient", m_Material->GetAmbientColor());
 	m_Material->GetAmbientTexture()->Bind(numberOfTexture);
@@ -53,6 +55,8 @@ void Mesh::Draw(Shader& shader) const
 	m_Vao->Bind();
 	glDrawElements(GL_TRIANGLES, m_IndicesNumber, GL_UNSIGNED_INT, 0);
 	m_Vao->Unbind();
+}
+
 }
 
 

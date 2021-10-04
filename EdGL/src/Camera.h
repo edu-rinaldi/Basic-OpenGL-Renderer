@@ -1,6 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
 
+namespace edgl {
+
 class Camera
 {
 private:
@@ -37,4 +39,6 @@ private:
 
 
 };
+
+}
 

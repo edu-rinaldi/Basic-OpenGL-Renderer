@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+namespace edgl {
+
 struct CursorPosition
 {
 	double posX, posY;
@@ -34,8 +36,8 @@ public:
 	int WindowShouldClose() const;
 	void MakeContextCurrent() const;
 	void SwapBuffers() const;
-	
-	
+
+
 
 };
 
@@ -48,7 +50,8 @@ public:
 
 private:
 	bool m_MultiSample;
-	
+
 };
 
+}
 

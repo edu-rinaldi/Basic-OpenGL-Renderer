@@ -1,13 +1,15 @@
 #include "Texture.h"
 
 #ifndef STB_IMAGE_IMPLEMENTATION
-    #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 #endif
 #include <stb/stb_image.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+
+namespace edgl {
 
 std::unordered_map<std::string, std::shared_ptr<Texture>> Texture::m_Cache = std::unordered_map<std::string, std::shared_ptr<Texture>>{};
 
@@ -22,7 +24,7 @@ std::unordered_map<std::string, std::shared_ptr<Texture>> Texture::m_Cache = std
 //    memcpy(m_Texture, obj.m_Texture, obj.m_Height * obj.m_Width * obj.m_NrChannels);
 //}
 
-Texture::Texture(TextureType targetType, const std::string& textureName) : 
+Texture::Texture(TextureType targetType, const std::string& textureName) :
     m_Type(targetType), m_CacheName(textureName)
 {
     // Generating texture
@@ -34,7 +36,7 @@ Texture::Texture(TextureType targetType, const std::string& textureName) :
     glTexParameteri(m_Type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(m_Type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(m_Type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
+
     // glTexImage2D(m_Type, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Texture);
     glGenerateMipmap(m_Type);
 
@@ -154,13 +156,13 @@ Texture2D::Texture2D(const std::string& texturePath, const std::string& textureN
     glBindTexture(m_Type, 0);
 }
 
-Texture2D::Texture2D(const glm::vec3& color, int width, int height, const std::string& textureName) : 
+Texture2D::Texture2D(const glm::vec3& color, int width, int height, const std::string& textureName) :
     Texture(TEXTURE_2D, textureName), m_Width(width), m_Height(height), m_NrChannels(3)
 {
     long dataSize = static_cast<long>(width * height * m_NrChannels);
     m_Data = std::unique_ptr<uint8_t>(new uint8_t[dataSize]);
     if (m_Data == nullptr) throw FailedToCreateTexture();
-    
+
     auto convertedColor = glm::clamp(color * 255.f, 0.f, 255.f);
     for (uint8_t* it = m_Data.get(); it < m_Data.get() + dataSize; it += m_NrChannels)
     {
@@ -179,7 +181,7 @@ Texture2D::Texture2D(const glm::vec4& color, int width, int height, const std::s
     long dataSize = static_cast<long>(width * height * m_NrChannels);
     m_Data = std::unique_ptr<uint8_t>(new uint8_t[dataSize]);
     if (m_Data == nullptr) throw FailedToCreateTexture();
-    
+
     auto convertedColor = glm::clamp(color * 255.f, 0.f, 255.f);
     for (uint8_t* it = m_Data.get(); it < m_Data.get() + dataSize; it += m_NrChannels)
     {
@@ -191,4 +193,6 @@ Texture2D::Texture2D(const glm::vec4& color, int width, int height, const std::s
     glBindTexture(m_Type, m_Id);
     glTexImage2D(m_Type, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Data.get());
     glBindTexture(m_Type, 0);
+}
+
 }

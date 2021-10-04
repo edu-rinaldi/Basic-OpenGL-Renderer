@@ -1,6 +1,8 @@
 #include "Window.h"
 #include "ErrorHandler.h"
 
+namespace edgl {
+
 Window::Window(const char* windowTitle, float width, float height) :
 	m_Window(glfwCreateWindow(width, height, windowTitle, NULL, NULL)),
 	m_Title(windowTitle),
@@ -34,7 +36,7 @@ void Window::SetWindowShouldClose(bool value) const
 
 void Window::SetMultiSample(bool value) const
 {
-	if(value) glEnable(GL_MULTISAMPLE);
+	if (value) glEnable(GL_MULTISAMPLE);
 	else glDisable(GL_MULTISAMPLE);
 }
 
@@ -78,7 +80,7 @@ WindowBuilder::WindowBuilder() : m_MultiSample(false)
 WindowBuilder& WindowBuilder::AddWindowHint(int windowHint, int value)
 {
 	glfwWindowHint(windowHint, value);
-	if(windowHint == GL_SAMPLES) m_MultiSample = true;
+	if (windowHint == GL_SAMPLES) m_MultiSample = true;
 	return *this;
 }
 
@@ -87,4 +89,6 @@ std::shared_ptr<Window> WindowBuilder::Build(const char* windowTitle, float widt
 	auto window = std::make_shared<Window>(windowTitle, width, height);
 	window->SetMultiSample(m_MultiSample);
 	return window;
+}
+
 }

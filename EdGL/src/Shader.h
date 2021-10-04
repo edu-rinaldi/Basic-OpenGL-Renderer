@@ -4,7 +4,9 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
-class Shader 
+namespace edgl {
+
+class Shader
 {
 	unsigned int m_Id;
 
@@ -33,3 +35,5 @@ public:
 
 	static std::string GetType(unsigned int type);
 };
+
+}

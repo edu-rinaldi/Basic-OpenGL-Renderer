@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 
+namespace edgl {
+
 struct VertexBufferElement
 {
 	unsigned int count;
@@ -12,12 +14,12 @@ struct VertexBufferElement
 
 	inline unsigned int GetSize() const
 	{
-		switch(type) 
+		switch (type)
 		{
-			case GL_FLOAT: return sizeof(float);
-			case GL_UNSIGNED_BYTE: return sizeof(unsigned char);
-			case GL_UNSIGNED_INT: return sizeof(unsigned int);
-			default: throw std::invalid_argument("Not valid VertexBufferElement::type");
+		case GL_FLOAT: return sizeof(float);
+		case GL_UNSIGNED_BYTE: return sizeof(unsigned char);
+		case GL_UNSIGNED_INT: return sizeof(unsigned int);
+		default: throw std::invalid_argument("Not valid VertexBufferElement::type");
 		}
 	}
 };
@@ -34,3 +36,5 @@ public:
 	inline const std::vector<VertexBufferElement>& GetElements() const { return m_Elements; }
 	inline unsigned int GetStride() const { return m_Stride; }
 };
+
+}

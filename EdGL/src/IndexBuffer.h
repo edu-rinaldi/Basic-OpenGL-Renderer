@@ -2,6 +2,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+namespace edgl {
+
 class IndexBuffer
 {
 private:
@@ -14,3 +16,5 @@ public:
 	void Bind() const;
 	void Unbind() const;
 };
+
+}

@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "Material.h"
 
+namespace edgl {
 
 Model::Model(const char* path) : m_Position(glm::vec3(0.0f)), m_ModelMatrix(glm::mat4(1.0f))
 {
@@ -46,7 +47,7 @@ void Model::Draw(Shader& shader) const
 
 void Model::ApplyMaterial(std::shared_ptr<Material> material)
 {
-	for(auto& mesh : m_Meshes)
+	for (auto& mesh : m_Meshes)
 		mesh->SetMaterial(material);
 }
 
@@ -74,7 +75,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		m_Meshes.push_back(ProcessMesh(mesh, scene));
 	}
-	
+
 	for (int i = 0; i < node->mNumChildren; ++i)
 	{
 		ProcessNode(node->mChildren[i], scene);
@@ -96,8 +97,8 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		glm::vec3 normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 		glm::vec2 texCoord = glm::vec2(0.f);
 		if (mesh->mTextureCoords[0])
-			 texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
-		
+			texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+
 		vertices.emplace_back(position, normal, texCoord);
 	}
 
@@ -120,10 +121,10 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, &color);
 		glm::vec3 ambientColor = { color.r, color.g, color.b };
 		aiMaterial->GetTexture(aiTextureType_AMBIENT, 0, &str);
-		std::shared_ptr<Texture> ambientTexture = strlen(str.C_Str()) == 0 ? 
-			Texture2D::FlatColor(glm::vec4(1.f), 1, 1, "white") : 
+		std::shared_ptr<Texture> ambientTexture = strlen(str.C_Str()) == 0 ?
+			Texture2D::FlatColor(glm::vec4(1.f), 1, 1, "white") :
 			Texture2D::FromFile(std::string(m_Directory) + str.C_Str());
-		
+
 
 		aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, &color);
 		glm::vec3 diffuseColor = { color.r, color.g, color.b };
@@ -131,7 +132,7 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		std::shared_ptr<Texture> diffuseTexture = strlen(str.C_Str()) == 0 ?
 			Texture2D::FlatColor(glm::vec4(1.f), 1, 1, "white") :
 			Texture2D::FromFile(std::string(m_Directory) + str.C_Str());
-		
+
 
 		aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, &color);
 		glm::vec3 specularColor = { color.r, color.g, color.b };
@@ -149,4 +150,6 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	}
 	else material = std::shared_ptr<Material>(new Material());
 	return std::shared_ptr<Mesh>(new Mesh(vertices, indices, material));
+}
+
 }
