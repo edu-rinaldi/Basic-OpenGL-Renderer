@@ -17,6 +17,11 @@ struct Material
 struct Light
 {
 	vec3 position;
+	vec3 direction;
+	float cutOff;
+
+	bool hasPosition;
+	bool hasDirection;
 
 	vec3 ambient;
 	vec3 diffuse;
@@ -34,9 +39,53 @@ in vec2 v_TexCoord;
 in vec3 v_WorldPosition;
 
 uniform Material material;
-uniform Light u_Light;
+uniform Light u_Light[6];
 
 uniform vec3 u_CameraPosition;
+
+float GetLightAttenuation(Light light, vec3 position);
+vec4 CalcDirectionalLight(Light light, Material material, vec3 normal, vec3 viewDirection);
+vec4 CalcPointLight(Light light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection);
+
+void main()
+{
+
+	// ambient
+	vec4 result = vec4(0);
+	
+	vec3 viewDirection = normalize(u_CameraPosition - v_WorldPosition);
+	// diffuse
+	vec3 norm = normalize(v_Normal);
+
+	result = vec4(u_Light[0].ambient * material.ambient, 1);
+	result += CalcDirectionalLight(u_Light[0], material, norm, viewDirection);
+	
+	for(int i=1; i < 6; i++)
+		result += CalcPointLight(u_Light[i], material, norm, v_WorldPosition, viewDirection);
+	// directional light
+	
+	
+	outColor = result;
+	// vec3 lightDirection = normalize(u_Light.position - v_WorldPosition);
+	// float diff = max(dot(norm, lightDirection), 0.0);
+	// vec3 diffuse = u_Light.diffuse * (diff * material.diffuse);
+
+	// // specular
+	// vec3 viewDirection = normalize(u_CameraPosition - v_WorldPosition);
+	// vec3 reflectDirection = reflect(-lightDirection, norm);
+	// float specularFactor = dot(viewDirection, reflectDirection);
+	// float spec = specularFactor > 0 ? pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) : 0;
+	// vec3 specular = u_Light.specular * (spec * material.specular);
+
+	// float attenuation = GetLightAttenuation(u_Light, v_WorldPosition);
+	// vec3 result = (ambient + diffuse + specular) ;
+	// outColor = vec4(result, 1) * 
+	// 	texture(material.specularTexture, v_TexCoord) * 
+	// 	texture(material.diffuseTexture, v_TexCoord) * 
+	// 	texture(material.ambientTexture, v_TexCoord) * attenuation;
+	
+	
+}
 
 float GetLightAttenuation(Light light, vec3 position)
 {
@@ -46,32 +95,42 @@ float GetLightAttenuation(Light light, vec3 position)
 	return 1.0 / dot(K,d);
 }
 
-void main()
+vec4 CalcDirectionalLight(Light light, Material material, vec3 normal, vec3 viewDirection)
 {
-
-	// ambient
-	vec3 ambient = u_Light.ambient * material.ambient;
-
+	vec3 lightDirection = normalize(-light.direction);
 	// diffuse
-	vec3 norm = normalize(v_Normal);
-	vec3 lightDirection = normalize(u_Light.position - v_WorldPosition);
-	float diff = max(dot(norm, lightDirection), 0.0);
-	vec3 diffuse = u_Light.diffuse * (diff * material.diffuse);
+	float diff = max(dot(normal, lightDirection), 0.0);
+	vec3 diffuse = light.diffuse * (diff * material.diffuse);
 
 	// specular
-	vec3 viewDirection = normalize(u_CameraPosition - v_WorldPosition);
-	vec3 reflectDirection = reflect(-lightDirection, norm);
+	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularFactor = dot(viewDirection, reflectDirection);
 	float spec = specularFactor > 0 ? pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) : 0;
-	vec3 specular = u_Light.specular * (spec * material.specular);
+	vec3 specular = light.specular * (spec * material.specular);
 
+	// combine results
+	vec3 result = specular + diffuse;
 
-	float attenuation = GetLightAttenuation(u_Light, v_WorldPosition);
-	vec3 result = (ambient + diffuse + specular) * attenuation;
-	outColor = vec4(result, 1) * 
-		texture(material.specularTexture, v_TexCoord) * 
-		texture(material.diffuseTexture, v_TexCoord) * 
-		texture(material.ambientTexture, v_TexCoord);
-	
-	
+	return vec4(result, 1) 	* 	texture(material.specularTexture, v_TexCoord) * 
+								texture(material.diffuseTexture, v_TexCoord);
+}
+
+vec4 CalcPointLight(Light light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection)
+{
+	vec3 lightDirection = normalize(light.position - fragPos);
+	// diffuse
+	float diff = max(dot(normal, lightDirection), 0.0);
+	vec3 diffuse = light.diffuse * (diff * material.diffuse);
+
+	// specular
+	vec3 reflectDirection = reflect(-lightDirection, normal);
+	float specularFactor = dot(viewDirection, reflectDirection);
+	float spec = specularFactor > 0 ? pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) : 0;
+	vec3 specular = light.specular * (spec * material.specular);
+
+	// combine results
+	vec3 result = specular + diffuse;
+
+	return vec4(result, 1) 	* 	texture(material.specularTexture, v_TexCoord) * 
+								texture(material.diffuseTexture, v_TexCoord) * GetLightAttenuation(light, fragPos);
 }

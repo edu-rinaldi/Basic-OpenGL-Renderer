@@ -82,5 +82,6 @@
         "stack": "cpp",
         "thread": "cpp",
         "unordered_set": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": true
 }

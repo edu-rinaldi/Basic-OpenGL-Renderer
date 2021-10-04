@@ -48,6 +48,15 @@ bool Application::Init(const ApplicationSettings& settings)
     }
     else glDisable(GL_BLEND);
 
+    if (settings.m_CullFace)
+    {
+        if (settings.m_CullFaceType == GL_FRONT || settings.m_CullFaceType == GL_BACK || settings.m_CullFaceType == GL_FRONT_AND_BACK)
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(settings.m_CullFaceType);
+        }
+    }
+
     if(glewInit() != GLEW_OK) 
     {
         // Log error

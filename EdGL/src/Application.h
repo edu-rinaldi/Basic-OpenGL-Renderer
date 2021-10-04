@@ -23,6 +23,9 @@ struct ApplicationSettings
     bool m_Blend;
     struct { unsigned int sourceFactor; unsigned int destinationFactor; } m_BlendFunction;
 
+    bool m_CullFace;
+    unsigned int m_CullFaceType;
+
     glm::vec4 m_ClearColor;
 
     float m_Fov;

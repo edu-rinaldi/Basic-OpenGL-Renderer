@@ -25,14 +25,19 @@ public:
 	inline unsigned int GetVerticesNumber() const { return m_VerticesNumber; }
 	inline unsigned int GetIndicesNumber() const { return m_IndicesNumber; }
 
+	inline bool CanApplyCullFace() const { return m_ApplyCullFace; }
+
 	void Draw(Shader& shader) const;
 	inline void SetMaterial(std::shared_ptr<Material> material) { m_Material = material; }
+	inline void EnableCullFace(bool value) { m_ApplyCullFace = value; }
 
 private:
 	unsigned int m_VerticesNumber;
 	unsigned int m_IndicesNumber;
 
 	std::shared_ptr<Material> m_Material;
+
+	bool m_ApplyCullFace;
 
 	VertexArray* m_Vao;
 	VertexBuffer* m_Vbo;

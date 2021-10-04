@@ -27,6 +27,7 @@ public:
 	void Scale(const glm::vec3& amount);
 	void Draw(Shader& shader) const;
 	void ApplyMaterial(std::shared_ptr<Material> material);
+	void EnableCullFace(bool value);
 private:
 	std::vector<std::shared_ptr<Mesh>> m_Meshes;
 	glm::vec3 m_Position;

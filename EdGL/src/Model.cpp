@@ -51,6 +51,11 @@ void Model::ApplyMaterial(std::shared_ptr<Material> material)
 		mesh->SetMaterial(material);
 }
 
+void Model::EnableCullFace(bool value)
+{
+	for (auto& mesh : m_Meshes) mesh->EnableCullFace(value);
+}
+
 void Model::LoadModel(const char* path)
 {
 	Assimp::Importer importer;

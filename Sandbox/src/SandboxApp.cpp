@@ -4,9 +4,11 @@
 #include "Model.h"
 #include "Texture.h"
 #include "Material.h"
+#include "Light.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/random.hpp>
 
 SandboxApp::SandboxApp() : 
     Application(GetSettings()),
@@ -30,10 +32,13 @@ edgl::ApplicationSettings SandboxApp::GetSettings()
     settings.m_DepthTest = true;
     settings.m_CursorsMode = GLFW_CURSOR_DISABLED;
 
-    settings.m_ClearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.f);
+    settings.m_ClearColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
 
     settings.m_Blend = true;
     settings.m_BlendFunction = { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA };
+
+    settings.m_CullFace = true;
+    settings.m_CullFaceType = GL_FRONT;
 
     settings.m_Fov = 60.f;
     return settings;
@@ -80,6 +85,7 @@ void SandboxApp::OnInit()
     auto plane = std::make_shared<Model>(modelPath4);
     plane->Scale(glm::vec3(10.f));
     plane->Move(glm::vec3(0.f));
+    plane->EnableCullFace(false);
     m_Models.push_back(plane);
 
     auto backpack = std::make_shared<Model>(modelPath1);
@@ -87,23 +93,42 @@ void SandboxApp::OnInit()
     backpack->Scale(glm::vec3(0.2f));
     m_Models.push_back(backpack);
     backpack->ApplyMaterial(specMaterial);
+    //backpack->EnableCullFace(false);
 
     auto backpack2 = std::make_shared<Model>(modelPath1);
     backpack2->Move(glm::vec3(2.f, 0.5f, 0.f));
     backpack2->Scale(glm::vec3(0.2f));
     m_Models.push_back(backpack2);
+    backpack2->EnableCullFace(false);
     
+    glm::vec3 lightColor = glm::vec3(0.8f);
+    glm::vec3 lightColor2 = glm::vec3(0.9f);
+    
+    auto directionalLight = std::make_shared<DirectionalLight>("u_Light[0]", glm::vec3(0, -1, -1), glm::vec3(0.0f), lightColor2, lightColor2, 1, 0.0014f, 0.000007f);
+    m_Lights.push_back(directionalLight);
+    directionalLight->AddToShader(*m_Shader);
+    glm::vec3 colors[] = { glm::vec3(0,0,1), glm::vec3(0,1,0), glm::vec3(1,0,0), glm::vec3(1,1,0), glm::vec3(1,0,1) };
+    for (int i = 1; i < 6; i++)
+    {
+        auto lcolor = colors[i - 1];
+        // lcolor = glm::vec3(0.5, 0.3, 0.8);
+        auto lpos = glm::gaussRand(glm::vec3(0, 1, 0), glm::vec3(1, 0, 1));
+        // lpos = glm::vec3(0) + glm::vec3(1, 0, 0) * float(i) * 0.5f;
+        auto pointLight = std::make_shared<PointLight>("u_Light[" + std::to_string(i) + "]", lpos, glm::vec3(0), lcolor, lcolor, 1, 0.0014f, 0.000007f);
+        m_Lights.push_back(pointLight);
+        pointLight->AddToShader(*m_Shader);
+    }
 
     m_Shader->SetMatrix4f("u_Projection", m_Projection);
     // Light
-    m_Shader->SetVec3("u_Light.position", glm::vec3(0,2.f,0));
-    glm::vec3 lightColor = glm::vec3(1.f);
+    /*m_Shader->SetVec3("u_Light.position", glm::vec3(0,2.f,0));
+    
     m_Shader->SetVec3("u_Light.ambient", glm::vec3(0.f));
     m_Shader->SetVec3("u_Light.diffuse", lightColor);
     m_Shader->SetVec3("u_Light.specular", lightColor);
     m_Shader->SetFloat("u_Light.constant", 1.f);
     m_Shader->SetFloat("u_Light.linear", 0.0014f);
-    m_Shader->SetFloat("u_Light.quadratic", 0.000007f);
+    m_Shader->SetFloat("u_Light.quadratic", 0.000007f);*/
 
 }
 
@@ -119,7 +144,7 @@ void SandboxApp::OnLoop(float dt)
     backpack->Rotate(1, glm::vec3(0, 1, 0));
     backpack2->Move(glm::vec3(- glm::sin(tmp) * dt * 8, 0, 0));
     tmp += 0.01;
-    m_Shader->SetVec3("u_Light.position", backpack2->GetPosition() + glm::vec3(0,0,1) * 0.5f);
+    m_Shader->SetVec3("u_Light[1].position", backpack2->GetPosition() + glm::vec3(0,0,1) * 0.5f);
     // View
     glm::mat4 view = m_Camera->GetViewMatrix();
     m_Shader->SetMatrix4f("u_View", view);

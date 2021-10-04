@@ -8,6 +8,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 	m_VerticesNumber(vertices.size()),
 	m_IndicesNumber(indices.size()),
 	m_Material(material),
+	m_ApplyCullFace(true),
 	m_Vao(new VertexArray()),
 	m_Vbo(new VertexBuffer((void*)vertices.data(), vertices.size() * sizeof(Vertex))),
 	m_Ibo(new IndexBuffer(indices.data(), indices.size()))
@@ -53,7 +54,15 @@ void Mesh::Draw(Shader& shader) const
 	shader.SetFloat("material.shininess", m_Material->GetShininess());
 
 	m_Vao->Bind();
+	bool cullface = CanApplyCullFace();
+	bool flag = false;
+	if (!cullface && glIsEnabled(GL_CULL_FACE)) 
+	{
+		glDisable(GL_CULL_FACE); 
+		flag = true;
+	}
 	glDrawElements(GL_TRIANGLES, m_IndicesNumber, GL_UNSIGNED_INT, 0);
+	if (flag) glEnable(GL_CULL_FACE);
 	m_Vao->Unbind();
 }
 
