@@ -2,6 +2,7 @@
 .env
 .vs
 .DS_Store
+.vscode
 
 build/
 build/*
