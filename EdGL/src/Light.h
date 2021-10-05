@@ -12,8 +12,7 @@ public:
     virtual void AddToShader(Shader& shader) const;
 protected:
     Light(const std::string& name,
-        const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular,
-        float constant, float linear, float quadratic);
+        const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
 
     std::string m_Name;
     glm::vec3 m_Ambient;
@@ -22,18 +21,13 @@ protected:
 
     bool m_HasPosition;
     bool m_HasDirection;
-
-    float m_Constant;
-    float m_Linear;
-    float m_Quadratic;
 };
 
 class DirectionalLight : public Light
 {
 public:
     DirectionalLight(const std::string& name, const glm::vec3& direction,
-                    const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular,
-                    float constant, float linear, float quadratic);
+                    const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
 
     virtual void AddToShader(Shader& shader) const override;
     inline const glm::vec3& GetDirection() { return m_Direction; }
@@ -53,14 +47,20 @@ public:
     inline const glm::vec3& GetPosition() { return m_Position; }
 private:
     glm::vec3 m_Position;
+    float m_Constant;
+    float m_Linear;
+    float m_Quadratic;
 };
 
 class SpotLight : public Light
 {
 public:
-    SpotLight(const std::string& name, const glm::vec3& position, const glm::vec3& direction, float cutOff,
-        const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular,
-        float constant, float linear, float quadratic);
+    SpotLight(const std::string& name, const glm::vec3& position, const glm::vec3& direction, 
+        float cutOff,
+        const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
+    SpotLight(const std::string& name, const glm::vec3& position, const glm::vec3& direction, 
+        float cutOff, float outCutOff,
+        const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
 
     virtual void AddToShader(Shader& shader) const override;
     
@@ -70,6 +70,7 @@ private:
     glm::vec3 m_Position;
     glm::vec3 m_Direction;
     float m_CutOff;
+    float m_OutCutOff;
 };
 
 }

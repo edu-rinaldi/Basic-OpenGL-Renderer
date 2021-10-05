@@ -40,15 +40,14 @@ uniform vec3 u_CameraPosition;
 
 float GetLightAttenuation(Light light, vec3 position)
 {
-	float distance = length(light.position - position);
+	float dist = length(light.position - position);
 	vec3 K = vec3(light.constant, light.linear, light.quadratic);
-	vec3 d = vec3(1.0, distance, pow(distance, 2.0));
-	return 1.0 / dot(K,d);
+	vec3 d = vec3(1.0, dist, pow(dist, 2.0));
+	return 1.0 / dot(K, d);
 }
 
 void main()
 {
-
 	// ambient
 	vec3 ambient = u_Light.ambient * material.ambient;
 

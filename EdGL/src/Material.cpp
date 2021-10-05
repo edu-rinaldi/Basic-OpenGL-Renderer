@@ -3,7 +3,7 @@
 namespace edgl {
 
 Material::Material() :
-	m_Ambient(glm::vec3(0.9f)),
+	m_Ambient(glm::vec3(1.f)),
 	m_AmbientTexture(),
 	m_Diffuse(glm::vec3(1.f)),
 	m_DiffuseTexture(),
