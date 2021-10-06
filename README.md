@@ -33,6 +33,7 @@ cmake ..
  Or for a better (?) experience just use CMake-GUI.
 
 ## Example image
-![bag](EdGL/img/bag.png)
+![multilight](EdGL/img/bagbunny2.png)
+![multilight](EdGL/img/bagbunny1.png)
 ![bb8](EdGL/img/bb8.png)
 <!-- ![test box](img/box_test1.png) -->

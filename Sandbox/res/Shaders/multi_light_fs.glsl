@@ -103,17 +103,17 @@ float GetLightAttenuation(Light light, vec3 position)
 vec4 CalcLight(Light light, Material material, vec3 normal, vec3 viewDirection, vec3 lightDirection)
 {
 	float diff = max(dot(normal, lightDirection), 0.0);
-	vec3 diffuse = light.diffuse * (diff * material.diffuse);
+	vec3 diffuse = light.diffuse * (diff * material.diffuse * texture(material.diffuseTexture, v_TexCoord).xyz);
 
 	// specular
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularFactor = dot(viewDirection, reflectDirection);
 	float spec = specularFactor > 0 ? pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) : 0;
-	vec3 specular = light.specular * (spec * material.specular);
+	vec3 specular = light.specular * (spec * material.specular * texture(material.specularTexture, v_TexCoord).xyz);
 
 	// combine results
 	vec4 result = vec4(specular + diffuse, 1);
-	return result * texture(material.specularTexture, v_TexCoord) * texture(material.diffuseTexture, v_TexCoord);
+	return result;
 }
 
 vec4 CalcDirectionalLight(Light light, Material material, vec3 normal, vec3 viewDirection)

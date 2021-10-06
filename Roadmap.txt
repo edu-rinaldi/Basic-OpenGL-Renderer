@@ -1,0 +1,7 @@
+# Project roadmap
+
+1. Normal maps and Parallax maps
+2. Shadows
+3. Shader library and shader generator systems (this latter based on which uniforms are loaded)
+4. PBR
+4. t.b.d. ...

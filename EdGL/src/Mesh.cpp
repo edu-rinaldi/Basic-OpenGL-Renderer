@@ -17,6 +17,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 	vbl.Push({ 3, GL_FLOAT, GL_FALSE });
 	vbl.Push({ 3, GL_FLOAT, GL_FALSE });
 	vbl.Push({ 2, GL_FLOAT, GL_FALSE });
+	vbl.Push({ 3, GL_FLOAT, GL_FALSE });
 
 	m_Vao->AddVertexBuffer(*m_Vbo, vbl);
 	m_Vao->AddIndexBuffer(*m_Ibo);

@@ -60,7 +60,7 @@ void Model::LoadModel(const char* path)
 {
 	Assimp::Importer importer;
 	// aiProcess_GenNormals ?
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
@@ -101,10 +101,14 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		glm::vec3 position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
 		glm::vec3 normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 		glm::vec2 texCoord = glm::vec2(0.f);
+		glm::vec3 tangent = glm::vec3(0.f);
 		if (mesh->mTextureCoords[0])
+		{
 			texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+			tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+		}
 
-		vertices.emplace_back(position, normal, texCoord);
+		vertices.emplace_back(position, normal, texCoord, tangent);
 	}
 
 	// Indices

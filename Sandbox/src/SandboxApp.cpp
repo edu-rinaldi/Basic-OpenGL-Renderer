@@ -76,12 +76,12 @@ void SandboxApp::OnInit()
     auto modelPath4 = "res/Models/floor/floor.obj";
     auto modelPath5 = "res/Models/mercedes/mercedes.obj";
     auto bb8Path = "res/Models/bb8/BB-8.obj";
-    auto spherePath = "res/Models/sphere/sphere.obj";
+    auto spherePath = "res/Models/bunny.ply";
     auto whiteTexture = Texture2D::FlatColor(glm::vec3(1.f), 1, 1, "white");
     auto specMaterial = std::shared_ptr<Material>(
         new Material(
             glm::vec3(0.2f), whiteTexture,
-            glm::vec3(0.7f), Texture2D::FlatColor(glm::vec3(1, 0, 0), 1, 1, "red"),
+            glm::vec3(0.7f), Texture2D::FromFile("res/Texture/uvgrid1.png", "uvgrid"),
             glm::vec3(1.f), whiteTexture,
             32)
         );
@@ -91,7 +91,7 @@ void SandboxApp::OnInit()
     plane->Move(glm::vec3(0.f));
     plane->EnableCullFace(false);
     m_Models.push_back(plane);
-
+    
     auto backpack = std::make_shared<Model>(modelPath1);
     backpack->Move(glm::vec3(0.f, 0.5f, 0.f));
     backpack->Scale(glm::vec3(0.2f));
@@ -99,15 +99,15 @@ void SandboxApp::OnInit()
     
     backpack->EnableCullFace(false);
 
-    auto sphere = std::make_shared<Model>(spherePath);
-    sphere->Move(glm::vec3(2.f, 0.5f, 0.f));
-    sphere->Scale(glm::vec3(0.2f));
-    sphere->ApplyMaterial(specMaterial);
-    m_Models.push_back(sphere);
-    sphere->EnableCullFace(false);
+    auto bunny = std::make_shared<Model>(spherePath);
+    bunny->Move(glm::vec3(2.f, 0.5f, 0.f));
+    bunny->Scale(glm::vec3(5.f));
+    bunny->ApplyMaterial(specMaterial);
+    m_Models.push_back(bunny);
+    bunny->EnableCullFace(false);
     
     // Directional light
-    auto dirLightCol = glm::vec3(1.f, 0.94f, 0.8f);
+    auto dirLightCol = glm::vec3(0.f);
     auto directionalLight = std::make_shared<DirectionalLight>("u_Light[0]", glm::vec3(0, -1, -1), glm::vec3(0.0f), dirLightCol, dirLightCol);
     m_Lights.push_back(directionalLight);
     directionalLight->AddToShader(*m_Shader);
@@ -145,7 +145,7 @@ void SandboxApp::OnInit()
     }
 
     auto spotLight = std::make_shared<SpotLight>("u_Light[9]",
-        backpack->GetPosition() + glm::vec3(0,1,0) * 4.f, glm::vec3(0,-1,0), 
+        backpack->GetPosition() + glm::vec3(0,1,0) * 4.f + glm::vec3(1,0,0) * 1.f, glm::vec3(0,-1,0), 
         glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(18.5f)),
         glm::vec3(0),
         glm::vec3(1, 0.94, 0.8), glm::vec3(1, 0.94, 0.8));
@@ -163,12 +163,13 @@ void SandboxApp::OnLoop(float dt)
     m_Shader->SetVec3("u_CameraPosition", m_Camera->GetPosition());
     
     auto backpack = m_Models[1];
-    auto sphere = m_Models[2];
+    auto bunny = m_Models[2];
 
     backpack->Rotate(1, glm::vec3(0, 1, 0));
-    sphere->Move(glm::vec3(- glm::sin(tmp) * dt * 8, 0, 0));
+    bunny->Rotate(-1, glm::vec3(0, 1, 0));
+    //bunny->Move(glm::vec3(- glm::sin(tmp) * dt * 2, 0, 0));
     tmp += 0.01;
-    m_Shader->SetVec3("u_Light[1].position", sphere->GetPosition() + glm::vec3(0,0,1) * 0.5f);
+    m_Shader->SetVec3("u_Light[1].position", bunny->GetPosition() + glm::vec3(0,0,1) * 0.5f);
 
     // View
     glm::mat4 view = m_Camera->GetViewMatrix();
