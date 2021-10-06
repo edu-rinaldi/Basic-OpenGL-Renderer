@@ -81,9 +81,9 @@ void SandboxApp::OnInit()
     auto specMaterial = std::shared_ptr<Material>(
         new Material(
             glm::vec3(0.2f), whiteTexture,
+            glm::vec3(0.7f), Texture2D::FlatColor(glm::vec3(1, 0, 0), 1, 1, "red"),
             glm::vec3(1.f), whiteTexture,
-            glm::vec3(1.f), whiteTexture,
-            128)
+            32)
         );
 
     auto plane = std::make_shared<Model>(modelPath4);
@@ -96,14 +96,15 @@ void SandboxApp::OnInit()
     backpack->Move(glm::vec3(0.f, 0.5f, 0.f));
     backpack->Scale(glm::vec3(0.2f));
     m_Models.push_back(backpack);
-    //backpack->ApplyMaterial(specMaterial);
+    
     backpack->EnableCullFace(false);
 
-    auto backpack2 = std::make_shared<Model>(modelPath1);
-    backpack2->Move(glm::vec3(2.f, 0.5f, 0.f));
-    backpack2->Scale(glm::vec3(0.2f));
-    m_Models.push_back(backpack2);
-    backpack2->EnableCullFace(false);
+    auto sphere = std::make_shared<Model>(spherePath);
+    sphere->Move(glm::vec3(2.f, 0.5f, 0.f));
+    sphere->Scale(glm::vec3(0.2f));
+    sphere->ApplyMaterial(specMaterial);
+    m_Models.push_back(sphere);
+    sphere->EnableCullFace(false);
     
     // Directional light
     auto dirLightCol = glm::vec3(1.f, 0.94f, 0.8f);
@@ -116,9 +117,7 @@ void SandboxApp::OnInit()
     for (int i = 1; i < 6; i++)
     {
         auto lcolor = colors[i - 1];
-        // lcolor = glm::vec3(0.5, 0.3, 0.8);
         auto lpos = glm::gaussRand(backpack->GetPosition(), glm::vec3(1, 0, 1));
-        // lpos = glm::vec3(0) + glm::vec3(1, 0, 0) * float(i) * 0.5f;
         auto pointLight = std::make_shared<PointLight>("u_Light[" + std::to_string(i) + "]", 
             lpos, 
             glm::vec3(0), 
@@ -137,7 +136,7 @@ void SandboxApp::OnInit()
         auto lpos = pos[i - 6];
 
         auto spotLight = std::make_shared<SpotLight>("u_Light[" + std::to_string(i) + "]", 
-            lpos, glm::vec3(0,-1,0), glm::cos(glm::radians(12.5f)),
+            lpos, glm::vec3(0,-1,0), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(19.5f)),
             glm::vec3(0),
             lcolor, lcolor);
 
@@ -146,8 +145,8 @@ void SandboxApp::OnInit()
     }
 
     auto spotLight = std::make_shared<SpotLight>("u_Light[9]",
-        m_Camera->GetPosition(), m_Camera->GetFront(), 
-        glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(19.5f)),
+        backpack->GetPosition() + glm::vec3(0,1,0) * 4.f, glm::vec3(0,-1,0), 
+        glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(18.5f)),
         glm::vec3(0),
         glm::vec3(1, 0.94, 0.8), glm::vec3(1, 0.94, 0.8));
 
@@ -164,15 +163,13 @@ void SandboxApp::OnLoop(float dt)
     m_Shader->SetVec3("u_CameraPosition", m_Camera->GetPosition());
     
     auto backpack = m_Models[1];
-    auto backpack2 = m_Models[2];
+    auto sphere = m_Models[2];
 
     backpack->Rotate(1, glm::vec3(0, 1, 0));
-    backpack2->Move(glm::vec3(- glm::sin(tmp) * dt * 8, 0, 0));
+    sphere->Move(glm::vec3(- glm::sin(tmp) * dt * 8, 0, 0));
     tmp += 0.01;
-    m_Shader->SetVec3("u_Light[1].position", backpack2->GetPosition() + glm::vec3(0,0,1) * 0.5f);
+    m_Shader->SetVec3("u_Light[1].position", sphere->GetPosition() + glm::vec3(0,0,1) * 0.5f);
 
-    m_Shader->SetVec3("u_Light[9].position", m_Camera->GetPosition());
-    m_Shader->SetVec3("u_Light[9].direction", m_Camera->GetFront());
     // View
     glm::mat4 view = m_Camera->GetViewMatrix();
     m_Shader->SetMatrix4f("u_View", view);
