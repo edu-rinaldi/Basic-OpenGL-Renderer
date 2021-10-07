@@ -1,5 +1,6 @@
 #include "Light.h"
 #include "Shader.h"
+#include "Model.h"
 
 namespace edgl {
 
@@ -45,7 +46,6 @@ void DirectionalLight::AddToShader(Shader& shader) const
 
 // Point light
 
-
 PointLight::PointLight(const std::string& name, const glm::vec3& position,
 	const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular,
 	float constant, float linear, float quadratic) :
@@ -53,8 +53,8 @@ PointLight::PointLight(const std::string& name, const glm::vec3& position,
 		m_Constant(constant), m_Linear(linear), m_Quadratic(quadratic),
 		m_Position(position)
 {
-	m_HasPosition = true;
 }
+
 
 void PointLight::AddToShader(Shader& shader) const
 {

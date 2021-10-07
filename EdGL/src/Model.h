@@ -21,7 +21,6 @@ public:
 	inline const glm::vec3 GetPosition() const { return GetModelMatrix() * glm::vec4(m_Position, 1); }
 
 	glm::mat4 GetModelMatrix() const;
-	glm::vec3 direction = glm::vec3(1.f, 0, 0);
 	void Move(const glm::vec3& amount);
 	void Rotate(float amount, const glm::vec3& rotationAxes);
 	void Scale(const glm::vec3& amount);

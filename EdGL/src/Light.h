@@ -1,10 +1,18 @@
 #pragma once
 #include <string>
+#include <memory>
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace edgl {
 
 class Shader;
+class Model;
+
+class DrawableLight
+{
+    virtual void Draw(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) const = 0;
+};
 
 class Light
 {

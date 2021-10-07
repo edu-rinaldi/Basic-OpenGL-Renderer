@@ -69,8 +69,11 @@ void main()
 	for(int i=6; i < 10; i++)
 		result += CalcSpotLight(u_Light[i], material, norm, v_WorldPosition, viewDirection);
 	
-	
+	#ifdef A
+	outColor = vec4(1,0,0,1);
+	#else
 	outColor = result;
+	#endif
 	// vec3 lightDirection = normalize(u_Light.position - v_WorldPosition);
 	// float diff = max(dot(norm, lightDirection), 0.0);
 	// vec3 diffuse = u_Light.diffuse * (diff * material.diffuse);

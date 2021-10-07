@@ -76,7 +76,8 @@ void SandboxApp::OnInit()
     auto modelPath4 = "res/Models/floor/floor.obj";
     auto modelPath5 = "res/Models/mercedes/mercedes.obj";
     auto bb8Path = "res/Models/bb8/BB-8.obj";
-    auto spherePath = "res/Models/bunny.ply";
+    auto bunnyPath = "res/Models/bunny.ply";
+    auto spherePath = "res/Models/sphere/sphere.obj";
     auto whiteTexture = Texture2D::FlatColor(glm::vec3(1.f), 1, 1, "white");
     auto specMaterial = std::shared_ptr<Material>(
         new Material(
@@ -99,7 +100,7 @@ void SandboxApp::OnInit()
     
     backpack->EnableCullFace(false);
 
-    auto bunny = std::make_shared<Model>(spherePath);
+    auto bunny = std::make_shared<Model>(bunnyPath);
     bunny->Move(glm::vec3(2.f, 0.5f, 0.f));
     bunny->Scale(glm::vec3(5.f));
     bunny->ApplyMaterial(specMaterial);
