@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 #include <glm/vec3.hpp>

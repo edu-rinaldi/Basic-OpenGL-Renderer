@@ -14,15 +14,17 @@ struct Material
 	float shininess;
 };
 
-struct Light
+struct DirectionalLight
+{
+	vec3 direction;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
+struct PointLight
 {
 	vec3 position;
-	vec3 direction;
-	float cutOff;
-	float outCutOff;
-
-	bool hasPosition;
-	bool hasDirection;
 
 	vec3 ambient;
 	vec3 diffuse;
@@ -33,6 +35,18 @@ struct Light
 	float quadratic;
 };
 
+struct SpotLight
+{
+	vec3 position;
+	vec3 direction;
+	float cutOff;
+	float outCutOff;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
 out vec4 outColor;
 
 in vec3 v_Normal;
@@ -40,15 +54,25 @@ in vec2 v_TexCoord;
 in vec3 v_WorldPosition;
 
 uniform Material material;
-uniform Light u_Light[10];
+
+#define MAX_POINT_LIGHTS 128
+#define MAX_SPOT_LIGHTS 128
+
+uniform DirectionalLight u_DirectionalLight;
+
+uniform PointLight	u_PointLights[MAX_POINT_LIGHTS];
+uniform int u_NrOfPointLights;
+
+uniform SpotLight 	u_SpotLights[MAX_SPOT_LIGHTS];
+uniform int u_NrOfSpotLights;
 
 uniform vec3 u_CameraPosition;
 
-float GetLightAttenuation(Light light, vec3 position);
-vec4 CalcLight(Light light, Material material, vec3 normal, vec3 viewDirection, vec3 lightDirection);
-vec4 CalcDirectionalLight(Light light, Material material, vec3 normal, vec3 viewDirection);
-vec4 CalcPointLight(Light light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection);
-vec4 CalcSpotLight(Light light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection);
+float GetLightAttenuation(PointLight light, vec3 position);
+vec4 CalcLight(vec3 lightDiffuse, vec3 lightSpecular, Material material, vec3 normal, vec3 viewDirection, vec3 lightDirection);
+vec4 CalcDirectionalLight(DirectionalLight light, Material material, vec3 normal, vec3 viewDirection);
+vec4 CalcPointLight(PointLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection);
+vec4 CalcSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection);
 
 void main()
 {
@@ -60,42 +84,20 @@ void main()
 	// diffuse
 	vec3 norm = normalize(v_Normal);
 
-	result = vec4(u_Light[0].ambient * material.ambient, 1);
-	result += CalcDirectionalLight(u_Light[0], material, norm, viewDirection);
+	result = vec4(u_DirectionalLight.ambient * material.ambient, 1);
+	result += CalcDirectionalLight(u_DirectionalLight, material, norm, viewDirection);
 	
-	for(int i=1; i < 6; i++)
-		result += CalcPointLight(u_Light[i], material, norm, v_WorldPosition, viewDirection);
+	for(int i=0; i < u_NrOfPointLights; ++i)
+		result += CalcPointLight(u_PointLights[i], material, norm, v_WorldPosition, viewDirection);
 	
-	for(int i=6; i < 10; i++)
-		result += CalcSpotLight(u_Light[i], material, norm, v_WorldPosition, viewDirection);
+	// for(int i=0; i < u_NrOfSpotLights; ++i)
+	// 	result += CalcSpotLight(u_SpotLights[i], material, norm, v_WorldPosition, viewDirection);
 	
-	#ifdef A
-	outColor = vec4(1,0,0,1);
-	#else
 	outColor = result;
-	#endif
-	// vec3 lightDirection = normalize(u_Light.position - v_WorldPosition);
-	// float diff = max(dot(norm, lightDirection), 0.0);
-	// vec3 diffuse = u_Light.diffuse * (diff * material.diffuse);
-
-	// // specular
-	// vec3 viewDirection = normalize(u_CameraPosition - v_WorldPosition);
-	// vec3 reflectDirection = reflect(-lightDirection, norm);
-	// float specularFactor = dot(viewDirection, reflectDirection);
-	// float spec = specularFactor > 0 ? pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) : 0;
-	// vec3 specular = u_Light.specular * (spec * material.specular);
-
-	// float attenuation = GetLightAttenuation(u_Light, v_WorldPosition);
-	// vec3 result = (ambient + diffuse + specular) ;
-	// outColor = vec4(result, 1) * 
-	// 	texture(material.specularTexture, v_TexCoord) * 
-	// 	texture(material.diffuseTexture, v_TexCoord) * 
-	// 	texture(material.ambientTexture, v_TexCoord) * attenuation;
-	
 	
 }
 
-float GetLightAttenuation(Light light, vec3 position)
+float GetLightAttenuation(PointLight light, vec3 position)
 {
 	float distance = length(light.position - position);
 	vec3 K = vec3(light.constant, light.linear, light.quadratic);
@@ -103,40 +105,40 @@ float GetLightAttenuation(Light light, vec3 position)
 	return 1.0 / dot(K,d);
 }
 
-vec4 CalcLight(Light light, Material material, vec3 normal, vec3 viewDirection, vec3 lightDirection)
+vec4 CalcLight(vec3 lightDiffuse, vec3 lightSpecular, Material material, vec3 normal, vec3 viewDirection, vec3 lightDirection)
 {
 	float diff = max(dot(normal, lightDirection), 0.0);
-	vec3 diffuse = light.diffuse * (diff * material.diffuse * texture(material.diffuseTexture, v_TexCoord).xyz);
+	vec3 diffuse = lightDiffuse * (diff * material.diffuse * texture(material.diffuseTexture, v_TexCoord).xyz);
 
 	// specular
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularFactor = dot(viewDirection, reflectDirection);
 	float spec = specularFactor > 0 ? pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess) : 0;
-	vec3 specular = light.specular * (spec * material.specular * texture(material.specularTexture, v_TexCoord).xyz);
+	vec3 specular = lightSpecular * (spec * material.specular * texture(material.specularTexture, v_TexCoord).xyz);
 
 	// combine results
 	vec4 result = vec4(specular + diffuse, 1);
 	return result;
 }
 
-vec4 CalcDirectionalLight(Light light, Material material, vec3 normal, vec3 viewDirection)
+vec4 CalcDirectionalLight(DirectionalLight light, Material material, vec3 normal, vec3 viewDirection)
 {
 	vec3 lightDirection = normalize(-light.direction);
-	return CalcLight(light, material, normal, viewDirection, lightDirection);
+	return CalcLight(light.diffuse, light.specular, material, normal, viewDirection, lightDirection);
 }
 
-vec4 CalcPointLight(Light light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection)
+vec4 CalcPointLight(PointLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection)
 {
 	vec3 lightDirection = normalize(light.position - fragPos);
-	return CalcLight(light, material, normal, viewDirection, lightDirection) * GetLightAttenuation(light, fragPos);
+	return CalcLight(light.diffuse, light.specular, material, normal, viewDirection, lightDirection) * GetLightAttenuation(light, fragPos);
 }
 
-vec4 CalcSpotLight(Light light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection)
+vec4 CalcSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDirection)
 {
 	vec3 lightDirection = normalize(light.position - fragPos);
 	float theta = dot(lightDirection, normalize(-light.direction));
 	float epsilon   = light.cutOff - light.outCutOff;
 	float intensity = clamp((theta - light.outCutOff) / epsilon, 0.0, 1.0);
 	// compute light
-	return CalcLight(light, material, normal, viewDirection, lightDirection) * intensity;
+	return CalcLight(light.diffuse, light.specular, material, normal, viewDirection, lightDirection) * intensity;
 }

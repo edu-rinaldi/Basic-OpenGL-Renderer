@@ -8,6 +8,7 @@ layout(location = 3) in vec2 tangent;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
 uniform mat4 u_Model;
+uniform mat4 u_TransposedInverseModel;
 
 
 out vec3 v_Normal;
@@ -17,11 +18,7 @@ out vec3 v_WorldPosition;
 void main()
 {
 	gl_Position		= u_Projection * u_View * u_Model * vec4(position, 1);
-	// v_Normal		= (u_Model * vec4(normal, 0)).xyz;
-	// mat3(transpose(inverse(view * model))) * aNormal
-	v_Normal = mat3(transpose(inverse(u_Model))) * normal;
-	
+	v_Normal = normalize((u_TransposedInverseModel * vec4(normal, 1)).xyz);
 	v_TexCoord		= texCoord;
-	// v_WorldPosition = mat3(transpose(inverse(u_Model))) * position;
 	v_WorldPosition = (u_Model * vec4(position, 1)).xyz;
 }

@@ -9,10 +9,6 @@ namespace edgl {
 class Shader;
 class Model;
 
-class DrawableLight
-{
-    virtual void Draw(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) const = 0;
-};
 
 class Light
 {

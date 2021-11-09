@@ -40,7 +40,9 @@ void Model::Scale(const glm::vec3& amount)
 void Model::Draw(Shader& shader) const
 {
 	shader.Bind();
-	shader.SetMatrix4f("u_Model", GetModelMatrix());
+	auto modelMat = GetModelMatrix();
+	shader.SetMatrix4f("u_Model", modelMat);
+	shader.SetMatrix4f("u_TransposedInverseModel", glm::transpose(glm::inverse(modelMat)));
 	for (const auto& mesh : m_Meshes)
 		mesh->Draw(shader);
 }
