@@ -1,11 +1,12 @@
 #pragma once
 #include <GL/glew.h>
-#include <memory>
 #include <string>
 #include <unordered_map>
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+
+#include "Util.h"
 
 namespace edgl {
 
@@ -29,7 +30,7 @@ class Texture
 public:
 	// Getters
 	virtual inline unsigned int GetId() const { return m_Id; }
-	virtual inline const std::unique_ptr<uint8_t>& GetTextureData() const { return m_Data; }
+	virtual inline const Scope<uint8_t>& GetTextureData() const { return m_Data; }
 
 	// Setters
 	// Texture Bind() / Unbind()
@@ -38,11 +39,11 @@ public:
 
 protected:
 	unsigned int m_Id;
-	std::unique_ptr<uint8_t> m_Data;
+	Scope<uint8_t> m_Data;
 	TextureType m_Type;
 	std::string m_CacheName;
 
-	static std::unordered_map<std::string, std::shared_ptr<Texture>> m_Cache;
+	static std::unordered_map<std::string, Ref<Texture>> m_Cache;
 
 	Texture(TextureType targetType, const std::string& textureName);
 	~Texture();
@@ -55,10 +56,10 @@ private:
 class Texture2D : public Texture
 {
 public:
-	static std::shared_ptr<Texture> FlatColor(const glm::vec3& color, int width, int height, const std::string& textureName);
-	static std::shared_ptr<Texture> FlatColor(const glm::vec4& color, int width, int height, const std::string& textureName);
-	static std::shared_ptr<Texture> FromFile(const std::string& texturePath, const std::string& textureName);
-	static std::shared_ptr<Texture> FromFile(const std::string& texturePath);
+	static Ref<Texture> FlatColor(const glm::vec3& color, int width, int height, const std::string& textureName);
+	static Ref<Texture> FlatColor(const glm::vec4& color, int width, int height, const std::string& textureName);
+	static Ref<Texture> FromFile(const std::string& texturePath, const std::string& textureName);
+	static Ref<Texture> FromFile(const std::string& texturePath);
 
 	inline int GetWidth() const { return m_Width; }
 	inline int GetHeight() const { return m_Height; }

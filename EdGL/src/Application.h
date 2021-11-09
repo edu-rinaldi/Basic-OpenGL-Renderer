@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/vec4.hpp>
+#include "Util.h"
 #include "Input.h"
 
 namespace edgl {
@@ -43,9 +44,9 @@ public:
     virtual void OnLoop(float dt);
     void Run();
 protected:
-    std::shared_ptr<Window> m_Window;
+    Ref<Window> m_Window;
     ApplicationSettings m_Settings;
-    inline virtual const std::shared_ptr<InputManager>& GetInputManager() const = 0;
+    inline virtual const Ref<InputManager>& GetInputManager() const = 0;
 private:
     float m_OldTime;
     float m_CurrentTime;

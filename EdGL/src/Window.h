@@ -47,7 +47,7 @@ class WindowBuilder
 public:
 	WindowBuilder();
 	WindowBuilder& AddWindowHint(int windowHint, int value);
-	std::shared_ptr<Window> Build(const char* windowTitle, float width, float height) const;
+	Ref<Window> Build(const char* windowTitle, float width, float height) const;
 
 private:
 	bool m_MultiSample;

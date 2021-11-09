@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "ErrorHandler.h"
+#include "Util.h"
 
 namespace edgl {
 
@@ -84,7 +85,7 @@ WindowBuilder& WindowBuilder::AddWindowHint(int windowHint, int value)
 	return *this;
 }
 
-std::shared_ptr<Window> WindowBuilder::Build(const char* windowTitle, float width, float height) const
+Ref<Window> WindowBuilder::Build(const char* windowTitle, float width, float height) const
 {
 	auto window = std::make_shared<Window>(windowTitle, width, height);
 	window->SetMultiSample(m_MultiSample);

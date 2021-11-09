@@ -4,7 +4,7 @@
 
 namespace edgl {
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Material> material) :
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, Ref<Material> material) :
 	m_VerticesNumber(vertices.size()),
 	m_IndicesNumber(indices.size()),
 	m_Material(material),

@@ -47,7 +47,7 @@ void Model::Draw(Shader& shader) const
 		mesh->Draw(shader);
 }
 
-void Model::ApplyMaterial(std::shared_ptr<Material> material)
+void Model::ApplyMaterial(Ref<Material> material)
 {
 	for (auto& mesh : m_Meshes)
 		mesh->SetMaterial(material);
@@ -89,11 +89,11 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+Ref<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	std::shared_ptr<Material> material;
+	Ref<Material> material;
 	// Vertices
 	vertices.reserve(mesh->mNumVertices);
 	for (int i = 0; i < mesh->mNumVertices; ++i)
@@ -132,7 +132,7 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, &color);
 		glm::vec3 ambientColor = { color.r, color.g, color.b };
 		aiMaterial->GetTexture(aiTextureType_AMBIENT, 0, &str);
-		std::shared_ptr<Texture> ambientTexture = strlen(str.C_Str()) == 0 ?
+		Ref<Texture> ambientTexture = strlen(str.C_Str()) == 0 ?
 			Texture2D::FlatColor(glm::vec4(1.f), 1, 1, "white") :
 			Texture2D::FromFile(std::string(m_Directory) + str.C_Str());
 
@@ -140,7 +140,7 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, &color);
 		glm::vec3 diffuseColor = { color.r, color.g, color.b };
 		aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &str);
-		std::shared_ptr<Texture> diffuseTexture = strlen(str.C_Str()) == 0 ?
+		Ref<Texture> diffuseTexture = strlen(str.C_Str()) == 0 ?
 			Texture2D::FlatColor(glm::vec4(1.f), 1, 1, "white") :
 			Texture2D::FromFile(std::string(m_Directory) + str.C_Str());
 
@@ -148,19 +148,19 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, &color);
 		glm::vec3 specularColor = { color.r, color.g, color.b };
 		aiMaterial->GetTexture(aiTextureType_SPECULAR, 0, &str);
-		std::shared_ptr<Texture> specularTexture = strlen(str.C_Str()) == 0 ?
+		Ref<Texture> specularTexture = strlen(str.C_Str()) == 0 ?
 			Texture2D::FlatColor(glm::vec4(1.f), 1, 1, "white") :
 			Texture2D::FromFile(std::string(m_Directory) + str.C_Str());
 
 		aiMaterial->Get(AI_MATKEY_SHININESS, shininess);
-		material = std::shared_ptr<Material>(
+		material = Ref<Material>(
 			new Material(ambientColor, ambientTexture,
 				diffuseColor, diffuseTexture,
 				specularColor, specularTexture,
 				shininess));
 	}
-	else material = std::shared_ptr<Material>(new Material());
-	return std::shared_ptr<Mesh>(new Mesh(vertices, indices, material));
+	else material = Ref<Material>(new Material());
+	return Ref<Mesh>(new Mesh(vertices, indices, material));
 }
 
 }

@@ -15,9 +15,9 @@ Material::Material() :
 }
 
 Material::Material(
-	const glm::vec3& ambient, std::shared_ptr<Texture> ambientTexture,
-	const glm::vec3& diffuse, std::shared_ptr<Texture> diffuseTexture,
-	const glm::vec3& specular, std::shared_ptr<Texture> specularTexture,
+	const glm::vec3& ambient, Ref<Texture> ambientTexture,
+	const glm::vec3& diffuse, Ref<Texture> diffuseTexture,
+	const glm::vec3& specular, Ref<Texture> specularTexture,
 	float shininess)
 	: m_Ambient(ambient), m_AmbientTexture(ambientTexture),
 	m_Diffuse(diffuse), m_DiffuseTexture(diffuseTexture),
